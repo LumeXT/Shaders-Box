@@ -1,0 +1,88 @@
+//static const float2 u_resolution = (2048.0);
+static const float pi = 3.141592653589793238462;
+static const float n = 3.0; //number of Circles
+static const float n2 = 3.0; //number of Circles2
+static const float n3 = 18.0; //number of Circles3
+float cx = 0.5;
+float cy = 0.5;
+//float r1 radius circle center				value 1
+float r2 = 0.2; // radius circles1 outside
+float d1 = 0.27; //distance circles1 outside
+float offset = 3.15; //offset circles2 outside
+float r3 = 0.1; // radius circles2 outside
+float d2 = 0.36; //distance circles2 outside
+float offset2 = 2.8; //offset circles2 outside
+float r4 = 0.025; // radius circles2 outside
+float d3 = 0.4; //distance circles2 outside
+//float r5 radius circles2 outside			value 1
+//circlesB
+float r1B = 0.910; // radius circles2 outside
+//float r2B  radius circles1 outside		value 0
+//float r3B  radius circles2 outside		value 0
+//float r4B  radius circles2 outside		value 0
+float r5B = 0.542; // radius circles2 outside
+
+float2 center1 = float2(cx,cy);
+float3 circlesAll = float3(0.0,0.0,0.0);
+float3 canvas = float3(0.0,0.0,0.0);
+
+
+struct Circle{
+		static inline float3 get_circle (float2 position, float3 color, float size)
+	{
+		float circle = sqrt (pow(position.x, 2.0)+ pow(position.y, 2.0));
+		circle = smoothstep (size,size + 0.003, 1.0 - circle);
+		return color*circle;
+	}
+
+};
+
+    
+{
+	float3 circle0 = Circle::get_circle(ScreenPosition - float2(0.5,0.5),float3(1.0,1.0,1.0),r1);
+    float3 circle1= Circle::get_circle(ScreenPosition - float2(0.5,0.5), float3(1.0,1.0,1.0),r1B);
+    float3 circle5= Circle::get_circle(ScreenPosition - float2(0.5,0.5), float3(1.0,1.0,1.0),r5);
+    float3 circle5B= Circle::get_circle(ScreenPosition - float2(0.5,0.5), float3(1.0,1.0,1.0),r5B);
+    circle1 -= circle0;
+    circle5B -= circle5;
+    circlesAll = circle5B + circle1;
+    
+    for (float i=0.0; i<n; i++)
+    {
+        float angle = i*2.0*pi/n;
+		float pointX = cx + d1* cos(angle) ;
+    	float pointY = cx + d1* sin(angle) ;
+        float circle2 = step(sqrt(pow(ScreenPosition.x - pointX, 2.0) + pow(ScreenPosition.y - pointY,2.0)),r2);
+        float circle2B = step(sqrt(pow(ScreenPosition.x - pointX, 2.0) + pow(ScreenPosition.y - pointY,2.0)),r2B);
+        circle2 -=circle2B;
+        circlesAll += circle2;
+    }
+    
+        for (float j=0.0; j<n2; j++)
+    {
+        float angle = j*2.0*pi/n2+offset;
+		float pointX = cx + d2* cos(angle) ;
+    	float pointY = cx + d2* sin(angle) ;
+        float circle3 = step(sqrt(pow(ScreenPosition.x - pointX, 2.0) + pow(ScreenPosition.y - pointY,2.0)),r3);
+        float circle3B = step(sqrt(pow(ScreenPosition.x - pointX, 2.0) + pow(ScreenPosition.y - pointY,2.0)),r3B);
+        circle3 -=circle3B;
+        circlesAll +=circle3;
+    }
+    
+            for (float k=0.0; k<n3; k++)
+    {
+        float angle = k*2.0*pi/n3+offset2;
+		float pointX = cx + d3* cos(angle) ;
+    	float pointY = cx + d3* sin(angle) ;
+        float circle4 = step(sqrt(pow(ScreenPosition.x - pointX, 2.0) + pow(ScreenPosition.y - pointY,2.0)),r4);
+        float circle4B = step(sqrt(pow(ScreenPosition.x - pointX, 2.0) + pow(ScreenPosition.y - pointY,2.0)),r4B);
+        circle4 -=circle4B;
+        circlesAll +=circle4;
+    }
+    
+    canvas += circlesAll;
+	//output = float4(canvas.x,canvas.y,canvas.z,1.0);
+
+    // Output to screen
+    return canvas;
+}
