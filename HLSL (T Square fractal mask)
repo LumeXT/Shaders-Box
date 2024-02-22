@@ -1,4 +1,6 @@
 //THIS SHADER IS SETUP TO WORK IN UNREAL ENGINE. SOME VARIABLES ARE FED WITH DATA IN THE MATERIAL EDITOR USUING NODES
+//SHADERTOY VERSION (https://www.shadertoy.com/view/cljGWh)
+
 //float2 uv = (fragCoord/iResolution.xy);
 //float levels =6.0;	define LEVELS
 //float iterations = 2.0;	define ITERATIONS
