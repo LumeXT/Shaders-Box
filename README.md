@@ -1,2 +1,2 @@
 # Shaders-Box
-research and development related with shaders
+research and development work related with shaders
