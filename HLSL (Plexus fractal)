@@ -1,0 +1,101 @@
+//float gridSize; //default 8.0
+//float flicker = 12.23; 
+//float flickerOverall = 6.0;  //0.1 for lower speed
+//float flickerSpeed = 0.7
+//float UVquads = 0.5;
+//float UVquadsAnim = 2.0;
+//float gridFixed = 5.0; //500 to fix the grid, lower for movement
+//float speedLightSpots = 1.5;  //multiply  by lower number go avoid movement
+//float gridSizeMultiplier = 1.5;
+//float sparkleIntensity = 1.0;
+//float sparkleQuadIntensity = 1.5; //low values (0.2) for translucent glass effect
+//float sparkleOverallIntensity = 0.005;
+//float3 color = float3(1., 0.5, 0.0); //define color
+//float lineMax = 0.014;
+//floaot lineMin = 0.01;
+
+struct Functions
+{
+    float distLine(float2 p, float2 a, float2 b) {
+        float2 ap = p - a;
+        float2 ab = b - a;
+        float aDotB = clamp(dot(ap, ab) / dot(ab, ab), 0.0, 1.0);
+        return length(ap - ab * aDotB);
+    }
+
+    float drawLine(float2 uv, float2 a, float2 b) {
+        float lineF = smoothstep(lineMax, lineMin, distLine(uv, a, b));
+        float dist = length(b-a);
+        return lineF * (smoothstep(1.3, 0.3, dist) * 0.5 + smoothstep(0.4, 0.03, abs(dist - 0.75)));
+    }
+
+    float n21(float2 i) {
+        i += frac(i * float2(0., 1.12));
+        i += dot(i, i + gridFixed);
+        return frac(i.x * i.y);
+    }
+	
+
+    float2 n22(float2 i) {
+        float x = n21(i);
+        return float2(x, n21(i));
+    }
+
+    float2 getPoint(float2 id, float2 offset, float iTime) {
+        return offset + sin(n22(id + offset) * iTime * speedLightSpots) * UVquads;
+    }
+
+    float layer(float2 uv, float iTime) {
+        float m = 0.0;
+        float t = iTime * UVquadsAnim;
+       
+        float2 gv = frac(uv) - 0.5;
+        float2 id = floor(uv) - 0.5;
+        
+        float2 p[9];
+        int i = 0;
+        for (float y = -1.0; y <= 1.0; y++) {
+            for (float x = -1.0; x <= 1.0; x++) {
+                p[i++] = getPoint(id, float2(x,y), iTime);
+            }
+        }
+        
+        for (int j = 0; j < 9; j++) {
+            m += drawLine(gv, p[4], p[j]);
+            float sparkle = sparkleIntensity / pow(length(gv - p[j]), sparkleQuadIntensity) * sparkleOverallIntensity;
+			sparkle = saturate (sparkle);
+            m += sparkle * abs((sin(t + frac(p[j].x) * flicker) * flickerOverall + flickerSpeed));
+        }
+         
+        return m;
+    }
+
+};
+
+Functions f;
+
+float2 uv = fragCoord - float2(0.5, 0.5) * iScale;
+float3 col = float3(0.0,0.0,0.0);
+
+//color.y += (uv.y + 0.5);
+//col += pow(-uv.y + 0.5, 5.0) * color;
+col += pow(-uv.y + 0.5, 5.0);
+
+float m = 1.0;
+float x = sin(iTime * 0.1);
+float y = cos(iTime * 0.2);
+
+//float2x2 rotMat = float2x2(x, y, -y, x);
+//uv = mul(rotMat, uv);
+
+
+
+for (float i = 0.0; i <= 1.0; i+= 1.0/4.0) {
+    float z = frac(i + iTime * 0.05);
+    float size = lerp(gridSize, .1, z) * gridSizeMultiplier;
+    float fade = smoothstep(0.0, 1.0,  z) * smoothstep(1.0, 0.9, z);
+    m += f.layer((size * uv) + i * 10.0, iTime) * fade;
+}
+
+col += m * color;
+return col; 
