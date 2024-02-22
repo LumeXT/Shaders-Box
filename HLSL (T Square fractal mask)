@@ -1,0 +1,31 @@
+//THIS SHADER IS SETUP TO WORK IN UNREAL ENGINE. SOME VARIABLES ARE FED WITH DATA IN THE MATERIAL EDITOR USUING NODES
+//float2 uv = (fragCoord/iResolution.xy);
+//float levels =6.0;	define LEVELS
+//float iterations = 2.0;	define ITERATIONS
+//float timeSpeed = 0.55; 	define TIME
+//float time;	timeNode
+//float center = abs(sin(time*timeSpeed)*2.0);	define fracal center position (2.0 for centered)
+//float kaleidoscopic = 1.0;	define pattern times repetition. Default 1.0
+
+float TSF = 0.0;
+
+int t1 = int(abs(cos(time*timeSpeed))*levels)+1;//use 'cos' or 'sin' for different animation
+float t2 = float(abs(sin(time*timeSpeed))*levels)+1;//use 'cos' or 'sin' for different animation
+
+
+for (float i=0.0;i < t2; i++)
+	{
+		if(i==0)
+			{
+			TSF = round(min(min(frac(uv).x,1.0-frac(uv).x),min(frac(uv).y,1.0-frac(uv).y))*center/kaleidoscopic);
+			}
+		else
+			{
+			TSF += round(min(min(frac(uv*iterations).x,1.0-frac(uv*iterations).x),min(frac(uv*iterations).y,1.0-frac(uv*iterations).y))*center );
+			iterations *=2.0;
+			}
+	}
+
+// Output to screen
+float3 output = float3(TSF,TSF,TSF);
+return output;
