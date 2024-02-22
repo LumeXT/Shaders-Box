@@ -1,0 +1,40 @@
+//float2  UV;
+//tex_in;
+//fragCoord;
+//int _Samples = 5; //number of Samples
+//float _Offset = 0.0; //offset
+//float _Lerp = 0.5; //offset
+//float _LOD = 0; //offset
+//worldSpaceCameraPos;
+//TextureIndex;
+//_symbolSize;
+//_chromaticAberration;
+
+
+
+float4 color = (0.0,0.0,0.0,0.0);
+float4 colorTemp = (0.0,0.0,0.0,1.0);
+float opacity = 0.8;
+float u_off = 0.0;
+float v_off = 0.0;
+int samples = _Samples;
+int LOOD = int(_LOD);
+
+color += Texture2DSample(tex_in, tex_inSampler , UV);
+    
+for (int i = 0; i< samples; i++)
+    { float2 uvs = float2(u_off , v_off);
+	  colorTemp += Texture2DSample(tex_in, tex_inSampler ,uvs + UV);
+	  //colorTemp = (colorTemp.x, colorTemp.y, colorTemp.z, colorTemp.w * opacity);
+      u_off += _Offset *(worldSpaceCameraPos.y - worldPos.y);
+      v_off += _Offset *(worldSpaceCameraPos.z - worldPos.z);
+	  //opacity *= 0.9;
+    }
+//color =  color + colorTemp;
+//not working
+color =  colorTemp;
+
+// Output to screen
+float4 render = (color / samples);
+float4 fragcolor = lerp(Texture2DSample(tex_in, tex_inSampler, UV), render , _Lerp);
+return fragcolor;
