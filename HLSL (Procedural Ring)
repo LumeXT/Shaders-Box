@@ -1,3 +1,5 @@
+//THIS SHADER IS SETUP TO WORK IN UNREAL ENGINE. SOME VARIABLES ARE FED WITH DATA IN THE MATERIAL EDITOR USUING NODES
+
 //static const float2 u_resolution = (2048.0);
 static const float pi = 3.141592653589793238462;
 static const float n = 3.0; //number of Circles
