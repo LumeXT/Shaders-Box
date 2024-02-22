@@ -1,3 +1,5 @@
+//THIS SHADER IS SETUP TO WORK IN UNREAL ENGINE. SOME VARIABLES ARE FED WITH DATA IN THE MATERIAL EDITOR USUING NODES
+
 //float gridSize; //default 8.0
 //float flicker = 12.23; 
 //float flickerOverall = 6.0;  //0.1 for lower speed
